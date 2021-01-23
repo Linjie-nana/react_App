@@ -1,0 +1,63 @@
+/* searchbar */
+.list_title{
+  width:100%;
+  height: 2.5rem;
+  background-color: #f9f9f9;
+  display:flex;
+  align-items:center;
+  justify-content:space-around;
+}
+.list_title .back {
+  font-size: 1rem;
+  color: #8f949b;
+}
+.list_title .tomap{
+  width:1.2rem;
+  height:1.2rem;
+  border-radius:.6rem;
+  border:1px solid #00a15b;
+  text-align:center;
+  line-height:1.2rem;
+  color:#00a15b;
+}
+
+.filter_list{
+    position:fixed;
+    left:0;
+    top:2.5rem;
+    z-index:900;
+    width:100%;
+    height:2rem;
+    background-color: #fff;
+    border-top:1px solid #ddd;    
+    display:flex;
+  }
+  
+  .filter_list li{
+    width:25%;
+    height:2rem;
+    font-size:14px;
+    background-color: #fafafa;
+    color:#333;
+    display:flex;
+    align-items:center;
+    border-bottom: 1px solid #ddd;
+    justify-content:center;
+    box-sizing:border-box;
+  }
+  
+  .filter_list li i{
+    color:#999;
+    padding-left:4px;
+  }
+  
+  .filter_list .active span,.filter_list .active i{
+    color:#00a15b;
+  }
+  
+  .filter_list .current{
+    border-left:1px solid #ddd;
+    border-right:1px solid #ddd;
+    border-bottom:1px solid #fff;
+    background-color: #fff;
+  }
