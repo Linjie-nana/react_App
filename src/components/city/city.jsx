@@ -1,6 +1,17 @@
 import React, { Component } from 'react';
 import './city.css'
 import store from '../../store'
+
+function fnFormatTitle(data) {
+    if (data === '#') {
+        return '当前定位'
+    } else if (data === 'hot') {
+        return '热门城市'
+    } else {
+        //转化大小
+        return data.toUpperCase()
+    }
+}
 class City extends Component {
     constructor(props) {
         super(props)
@@ -43,8 +54,10 @@ class City extends Component {
         oCityList['#'] = [this.state.oCurrentCity]
         aCityKey.unshift('#')
 
-        console.log(oCityList);
-        console.log(aCityKey);
+        this.setState({
+            oCityList,
+            aCityKey
+        })
     }
 
     fnFormatData(list) {
@@ -64,6 +77,7 @@ class City extends Component {
     }
 
     render() {
+        let { oCityList, aCityKey } = this.state;
         return (
             <div className={this.props.sClass}>
                 <div className="city_title">
@@ -72,73 +86,28 @@ class City extends Component {
                 </div>
 
                 <div className="group_con">
-                    <div className="city_group">
-                        <h4>当前定位</h4>
-                        <ul>
-                            <li>深圳</li>
-                        </ul>
-                    </div>
-                    <div className="city_group">
-                        <h4>热门城市</h4>
-                        <ul>
-                            <li>北京</li>
-                            <li>上海</li>
-                            <li>广州</li>
-                        </ul>
-                    </div>
-                    <div className="city_group">
-                        <h4>A</h4>
-                        <ul>
-                            <li>安庆</li>
-                        </ul>
-                    </div>
-                    <div className="city_group">
-                        <h4>B</h4>
-                        <ul>
-                            <li>北京</li>
-                            <li>北海</li>
-                            <li>宝鸡</li>
-                            <li>保定</li>
-                            <li>保亭</li>
-                        </ul>
-                    </div>
-                    <div className="city_group">
-                        <h4>C</h4>
-                        <ul>
-                            <li>成都</li>
-                            <li>重庆</li>
-                            <li>长沙</li>
-                            <li>常德</li>
-                            <li>常州</li>
-                            <li>澄迈</li>
-                            <li>承德</li>
-                            <li>滁州</li>
-                            <li>长春</li>
-                        </ul>
-                    </div>
+                    {aCityKey.map(item => (
+                        <div className="city_group" key={item}>
+                            <h4>{fnFormatTitle(item)}</h4>
+                            <ul>
+                                {oCityList[item].map(val =>
+                                    <li key={val.value}>{val.label}</li>
+                                )}
+
+                            </ul>
+                        </div>
+                    ))}
+
+
                 </div>
                 <ul className="city_index">
-                    <li><span>#</span></li>
-                    <li><span>热</span></li>
+                    {
+                        aCityKey.map(item => <li key={item}><span>{(item === 'hot') ? '热' : item.toUpperCase()}</span></li>)
+                    }
+
+
                     <li className="active"><span>A</span></li>
-                    <li><span>B</span></li>
-                    <li><span>C</span></li>
-                    <li><span>D</span></li>
-                    <li><span>F</span></li>
-                    <li><span>G</span></li>
-                    <li><span>H</span></li>
-                    <li><span>J</span></li>
-                    <li><span>K</span></li>
-                    <li><span>L</span></li>
-                    <li><span>M</span></li>
-                    <li><span>N</span></li>
-                    <li><span>Q</span></li>
-                    <li><span>S</span></li>
-                    <li><span>T</span></li>
-                    <li><span>W</span></li>
-                    <li><span>X</span></li>
-                    <li><span>Y</span></li>
-                    <li><span>Z</span></li>
+
                 </ul>
             </div>
         );
