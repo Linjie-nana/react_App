@@ -18,9 +18,11 @@ class City extends Component {
         this.state = {
             oCityList: [],
             aCityKey: [],
-            oCurrentCity: store.getState()
+            oCurrentCity: store.getState(),
+            iNow: 0
         }
         this.unsubscrbe = store.subscribe(this.fnChangeCity)
+        this.oMyRef = React.createRef()
 
     }
     //卸载前取消订阅
@@ -99,9 +101,21 @@ class City extends Component {
         return 40 + 58 * iLen
     }
 
+    //滚动方法
+    onRowsRendered = ({ startIndex }) => {
+        this.setState({
+            iNow: startIndex
+        })
+    }
+
+    //点击滚动到某处
+    fnScrollToRow = (i) => {
+        this.oMyRef.current.scrollToRow(i)
+    }
+
 
     render() {
-        let { aCityKey } = this.state;
+        let { aCityKey, iNow } = this.state;
         return (
             <div className={this.props.sClass}>
                 <div className="city_title">
@@ -121,13 +135,24 @@ class City extends Component {
                                 rowHeight={this.rouHight}
                                 //输出结构
                                 rowRenderer={this.rowRenderer}
+                                //滚动时的方法
+                                onRowsRendered={this.onRowsRendered}
+
+                                //点击右侧滚动要需要的内容的操作
+                                //ref定向到这个组件
+                                ref={this.oMyRef}
+                                //设置List组件的滚动对齐方式：顶部对齐
+                                scrollToAlignment='start'
                             />
                         )}
                     </AutoSizer>
                 </div>
                 <ul className="city_index">
                     {
-                        aCityKey.map(item => <li key={item}><span>{(item === 'hot') ? '热' : item.toUpperCase()}</span></li>)
+                        aCityKey.map((item, i) =>
+                            <li className={(i === iNow) ? 'active' : ''} key={item} onClick={() => this.fnScrollToRow(i)}>
+                                <span>{(item === 'hot') ? '热' : item.toUpperCase()}</span>
+                            </li>)
                     }
                 </ul>
             </div>
