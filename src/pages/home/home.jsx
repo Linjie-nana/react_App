@@ -41,7 +41,7 @@ class SearchBar extends Component {
         return (
             <div className="search_bar">
                 <CitySelect />
-                <Link to='/map'> <i className="iconfont icon-ic-maplocation-o tomap"></i></Link>
+                <i className="iconfont icon-ic-maplocation-o tomap"></i>
             </div>
         );
     }
@@ -107,7 +107,7 @@ class Menu extends Component {
                         <h4>合租</h4>
                     </li>
                     <li>
-                        <Link href="#"><i className="iconfont icon-ic-maplocation-o"></i></Link>
+                        <Link to='/map'><i className="iconfont icon-ic-maplocation-o"></i></Link>
                         <h4>地图找房</h4>
                     </li>
                     <li>
