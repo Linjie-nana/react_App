@@ -23,6 +23,7 @@ class City extends Component {
         }
         this.unsubscrbe = store.subscribe(this.fnChangeCity)
         this.oMyRef = React.createRef()
+        this.bIsScroll = true
 
     }
     //卸载前取消订阅
@@ -103,14 +104,25 @@ class City extends Component {
 
     //滚动方法
     onRowsRendered = ({ startIndex }) => {
-        this.setState({
-            iNow: startIndex
-        })
+        if (this.bIsScroll) {
+            this.setState({
+                iNow: startIndex
+            })
+        }
+
     }
 
     //点击滚动到某处
     fnScrollToRow = (i) => {
+        this.bIsScroll = false
         this.oMyRef.current.scrollToRow(i)
+        this.setState({
+            iNow: i
+        })
+        setTimeout(() => {
+            this.bIsScroll = true
+        }, 200)
+
     }
 
 
