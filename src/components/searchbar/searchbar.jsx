@@ -3,6 +3,7 @@ import './searchbar.css'
 //导进仓库管理中心
 import store from '../../store'
 import City from '../city/city'
+
 class CitySelect extends Component {
     constructor(props) {
         super(props)

@@ -41,7 +41,7 @@ class SearchBar extends Component {
         return (
             <div className="search_bar">
                 <CitySelect />
-                <i className="iconfont icon-ic-maplocation-o tomap"></i>
+                <Link to='/map'> <i className="iconfont icon-ic-maplocation-o tomap"></i></Link>
             </div>
         );
     }
