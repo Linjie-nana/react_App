@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './city.css'
 import store from '../../store'
 import { AutoSizer, List } from 'react-virtualized'
+import { Toast } from 'antd-mobile'
 function fnFormatTitle(data) {
     if (data === '#') {
         return '当前定位'
@@ -34,6 +35,16 @@ class City extends Component {
     fnChangeCity = () => {
         this.setState({
             oCurrentCity: store.getState()
+        }, () => {
+            this.setState(state => {
+                let newCityList = state.oCityList;
+                //在成功修改城市后，回调中修改#当前城市
+                newCityList['#'] = [state.oCurrentCity];
+                return {
+                    //返回修改当前城市后的城市列表
+                    oCityList: newCityList
+                }
+            })
         })
     }
 
@@ -79,6 +90,7 @@ class City extends Component {
         }
     }
 
+
     //列表优化
     rowRenderer = ({ key, index, style, }) => {
         let item = this.state.aCityKey[index]
@@ -87,7 +99,7 @@ class City extends Component {
                 <h4>{fnFormatTitle(item)}</h4>
                 <ul>
                     {this.state.oCityList[item].map(val =>
-                        <li key={val.value} onClick={this.checkCity}>{val.label}</li>
+                        <li key={val.value} onClick={() => this.checkCity(val.label)}>{val.label}</li>
                     )}
                 </ul>
             </div>
@@ -123,6 +135,27 @@ class City extends Component {
             this.bIsScroll = true
         }, 200)
 
+    }
+    //选择城市
+    checkCity = async sName => {
+        if (sName === this.state.oCurrentCity.label) {
+            Toast.info('已选中该城市', 2)
+        }
+        let res = await this.axios.get('/area/info?name=' + sName);
+        if (sName !== '上海' && res.data.body.label === '上海') {
+            Toast.info('当前城市不在服务区', 2)
+        } else {
+            sessionStorage.setItem('haoke_current_city', JSON.stringify(res.data.body))
+
+            store.dispatch({
+                type: "change_current_city",
+                value: res.data.body
+            });
+            this.props.fnSwitch('city_wrap')
+            //刷新数据
+            // this.fnGetData()
+            //但是要多发送多一次请求
+        }
     }
 
 
@@ -171,9 +204,7 @@ class City extends Component {
         );
     }
 
-    checkCity = () => {
-        this.props.fnSwitch('city_wrap')
-    }
+
 }
 
 export default City;

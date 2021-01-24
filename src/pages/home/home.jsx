@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 //导入轮播图组件需要得资源
 import { Carousel } from 'antd-mobile';
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import './home.css'
 import { BASE_URL } from '../../utils'
 import CitySelect from '../../components/searchbar/searchbar'
@@ -10,37 +10,37 @@ import store from '../../store'
 class SearchBar extends Component {
     componentDidMount() {
         //优化请求次数，判断本地有没有定位当前城市信息，有就不用请求，否则就请求
-        let sCurrentCity = localStorage.getItem("haoke_current_city")
+        let sCurrentCity = sessionStorage.getItem("haoke_current_city")
         //判断
         if (sCurrentCity) {
+            console.log(11111111111111111111111111111111);
             //如果有就不请求，把数据存到redux数据中心
             //创建工单并提交
             store.dispatch({
                 type: "change_current_city",
-                value:JSON.parse(sCurrentCity)
+                value: JSON.parse(sCurrentCity)
             })
         } else {
             //否则就请求
             let BMap = window.BMap
             let myCity = new BMap.LocalCity();
-            myCity.get(async result=>{
+            myCity.get(async result => {
                 let cityName = result.name;
                 //把定位得位置作为参数传给请求地址
                 let oRes = await this.axios.get("/area/info?name=" + cityName)
-                console.log(oRes);
                 //把获取得地址对象存储在sessionStorage
                 sessionStorage.setItem("haoke_current_city", JSON.stringify(oRes.data.body))
                 store.dispatch({
                     type: "change_current_city",
-                    value:oRes.data.body
+                    value: oRes.data.body
                 })
-            }); 
+            });
         }
     }
     render() {
         return (
             <div className="search_bar">
-                <CitySelect/>
+                <CitySelect />
                 <i className="iconfont icon-ic-maplocation-o tomap"></i>
             </div>
         );
@@ -61,33 +61,33 @@ class Slide extends Component {
         let oRes = await this.axios.get("/home/swiper")
         console.log(oRes);
         this.setState({
-            data:oRes.data.body
+            data: oRes.data.body
         })
     }
     render() {
         return (
             <div className="slide_con">
                 {
-                    this.state.data.length > 0 &&  <Carousel
-                    autoplay={true}
-                    infinite
-                  >
-                    {this.state.data.map(item => (
-                      <a
-                        key={item.id}
-                        href="http://www.alipay.com"
-                        style={{ display: 'inline-block', width: '100%', height: "10.6rem" }}
-                      >
-                        <img
-                          src={BASE_URL + item.imgSrc}
-                          alt=""
-                          style={{ width: '100%', verticalAlign: 'top' }}
-                        />
-                      </a>
-                    ))}
-                  </Carousel>
+                    this.state.data.length > 0 && <Carousel
+                        autoplay={true}
+                        infinite
+                    >
+                        {this.state.data.map(item => (
+                            <a
+                                key={item.id}
+                                href="http://www.alipay.com"
+                                style={{ display: 'inline-block', width: '100%', height: "10.6rem" }}
+                            >
+                                <img
+                                    src={BASE_URL + item.imgSrc}
+                                    alt=""
+                                    style={{ width: '100%', verticalAlign: 'top' }}
+                                />
+                            </a>
+                        ))}
+                    </Carousel>
                 }
-               
+
             </div>
         );
     }
@@ -99,19 +99,19 @@ class Menu extends Component {
             <div>
                 <ul className="menu_con">
                     <li>
-                        <a href="#"><i className="iconfont icon-zufang1"></i></a>
+                        <Link href="#"><i className="iconfont icon-zufang1"></i></Link>
                         <h4>整租</h4>
                     </li>
                     <li>
-                        <a href="#"><i className="iconfont icon-usergroup"></i></a>
+                        <Link href="#"><i className="iconfont icon-usergroup"></i></Link>
                         <h4>合租</h4>
                     </li>
                     <li>
-                        <a href="#"><i className="iconfont icon-ic-maplocation-o"></i></a>
+                        <Link href="#"><i className="iconfont icon-ic-maplocation-o"></i></Link>
                         <h4>地图找房</h4>
                     </li>
                     <li>
-                        <a href="#"><i className="iconfont icon-zufang"></i></a>
+                        <Link href="#"><i className="iconfont icon-zufang"></i></Link>
                         <h4>去出租</h4>
                     </li>
                 </ul>
@@ -133,7 +133,7 @@ class Group extends Component {
         let oRes = await this.axios.get("/home/groups?area=AREA%7C88cff55c-aaa4-e2e0")
         console.log(oRes);
         this.setState({
-            data:oRes.data.body
+            data: oRes.data.body
         })
     }
     render() {
@@ -146,10 +146,10 @@ class Group extends Component {
                 <ul className="house_list">
                     {this.state.data.map(item => (
                         <li key={item.id}>
-                        <p className="fl">{item.title}</p>
-                        <img src={BASE_URL + item.imgSrc} alt="" className="fr" />
-                        <span className="fl">{item.desc}</span>
-                    </li>
+                            <p className="fl">{item.title}</p>
+                            <img src={BASE_URL + item.imgSrc} alt="" className="fr" />
+                            <span className="fl">{item.desc}</span>
+                        </li>
                     ))}
                 </ul>
                 {/* 
@@ -162,9 +162,9 @@ class Group extends Component {
     }
 }
 //资讯组件
-class News extends Component{
+class News extends Component {
     state = {
-        data:[]
+        data: []
     }
     componentDidMount() {
         this.fnGetdata()
@@ -173,7 +173,7 @@ class News extends Component{
         let oRes = await this.axios.get("/home/news?area=AREA%7C88cff55c-aaa4-e2e0")
         console.log(oRes);
         this.setState({
-            data:oRes.data.body
+            data: oRes.data.body
         })
     }
     render() {
@@ -181,25 +181,25 @@ class News extends Component{
             <div className="model mb120">
                 <div className="title_con">
                     <h3>最新资讯</h3>
-                    <a href="#" className="iconfont icon-next"></a>
+                    <Link href="#" className="iconfont icon-next"></Link>
                 </div>
                 <ul className="list">
                     {
                         this.state.data.map(item => (
                             <li key={item.id}>
-                            <Link to="/"><img src={BASE_URL + item.imgSrc} alt="" /></Link>
-                            <div className="detail_list">
-                                <h4>{item.title}</h4>
-                                <div className="detail">
-                                    <span>{item.from}</span>
-                                    <em>{item.date}</em>
+                                <Link to="/"><img src={BASE_URL + item.imgSrc} alt="" /></Link>
+                                <div className="detail_list">
+                                    <h4>{item.title}</h4>
+                                    <div className="detail">
+                                        <span>{item.from}</span>
+                                        <em>{item.date}</em>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
+                            </li>
                         ))
                     }
                 </ul>
-        </div>
+            </div>
         )
     }
 }
@@ -208,11 +208,11 @@ class Home extends Component {
     render() {
         return (
             <div>
-                <SearchBar/>
+                <SearchBar />
                 <Slide />
                 <Menu />
                 <Group />
-                <News/>
+                <News />
             </div>
         );
     }
