@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './city.css'
 import store from '../../store'
-
+import { AutoSizer, List } from 'react-virtualized'
 function fnFormatTitle(data) {
     if (data === '#') {
         return '当前定位'
@@ -76,8 +76,32 @@ class City extends Component {
         }
     }
 
+    //列表优化
+    rowRenderer = ({ key, index, style, }) => {
+        let item = this.state.aCityKey[index]
+        return (
+            <div className="city_group" key={key} style={style}>
+                <h4>{fnFormatTitle(item)}</h4>
+                <ul>
+                    {this.state.oCityList[item].map(val =>
+                        <li key={val.value} onClick={this.checkCity}>{val.label}</li>
+                    )}
+                </ul>
+            </div>
+        );
+    }
+
+    //计算每一行高度的方法
+    rouHight = ({ index }) => {
+        // index是引用时自带的参
+        let item = this.state.aCityKey[index];
+        let iLen = this.state.oCityList[item].length;
+        return 40 + 58 * iLen
+    }
+
+
     render() {
-        let { oCityList, aCityKey } = this.state;
+        let { aCityKey } = this.state;
         return (
             <div className={this.props.sClass}>
                 <div className="city_title">
@@ -86,31 +110,32 @@ class City extends Component {
                 </div>
 
                 <div className="group_con">
-                    {aCityKey.map(item => (
-                        <div className="city_group" key={item}>
-                            <h4>{fnFormatTitle(item)}</h4>
-                            <ul>
-                                {oCityList[item].map(val =>
-                                    <li key={val.value}>{val.label}</li>
-                                )}
-
-                            </ul>
-                        </div>
-                    ))}
-
-
+                    <AutoSizer>
+                        {/* 自动高度 */}
+                        {({ height, width }) => (
+                            <List
+                                width={width}
+                                height={height}
+                                rowCount={aCityKey.length}
+                                //每个模块的高度
+                                rowHeight={this.rouHight}
+                                //输出结构
+                                rowRenderer={this.rowRenderer}
+                            />
+                        )}
+                    </AutoSizer>
                 </div>
                 <ul className="city_index">
                     {
                         aCityKey.map(item => <li key={item}><span>{(item === 'hot') ? '热' : item.toUpperCase()}</span></li>)
                     }
-
-
-                    <li className="active"><span>A</span></li>
-
                 </ul>
             </div>
         );
+    }
+
+    checkCity = () => {
+        this.props.fnSwitch('city_wrap')
     }
 }
 
