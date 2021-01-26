@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import './map.css'
 import store from '../../store/index.js'
-class Map extends Component {
+let BMap = window.BMap
 
+class Map extends Component {
 
     constructor(props) {
         super(props);
@@ -27,9 +28,8 @@ class Map extends Component {
 
     componentDidMount() {
         console.log(this.state.oCurrentCity);
-        let BMap = window.BMap
         //创建地图实例
-        let map = new BMap.Map("baidu_map");
+        this.map = new BMap.Map("baidu_map");
         // // 创建坐标  
         // var point = new BMap.Point(116.404, 39.915);
         // // 初始化地图，设置中心点坐标和地图级别 
@@ -38,18 +38,34 @@ class Map extends Component {
 
         let myGeo = new BMap.Geocoder();
         // 将地址解析结果显示在地图上，并调整地图视野    
-        myGeo.getPoint(this.state.oCurrentCity.label, function (point) {
+        myGeo.getPoint(this.state.oCurrentCity.label, point => {
             if (point) {
-                map.centerAndZoom(point, 16);
+                this.map.centerAndZoom(point, 11);
+                this.fnAddOverLay(point);
             }
         }, this.state.oCurrentCity.label);
 
         //地图组件
-        map.addControl(new BMap.NavigationControl());
-        map.addControl(new BMap.ScaleControl());
-        map.addControl(new BMap.OverviewMapControl());
-        map.addControl(new BMap.MapTypeControl());
+        this.map.addControl(new BMap.NavigationControl());
+        this.map.addControl(new BMap.ScaleControl());
+        this.map.addControl(new BMap.OverviewMapControl());
+        this.map.addControl(new BMap.MapTypeControl());
+    }
 
+    //自定义标签方法 http://lbsyun.baidu.com/jsdemo.htm#eAddLabel
+    fnAddOverLay = (point) => {
+        let opts = {
+            position: point, // 指定文本标注所在的地理位置
+            offset: new BMap.Size(37, -37) // 设置文本偏移量
+        };
+        // 创建文本标注对象
+        let label = new BMap.Label('<div class="map_label01">文本<br />套数</div>', opts);
+        // 自定义文本标注样式
+        label.setStyle({
+            border: '0px',
+            backgroundColor: 'transparent'
+        });
+        this.map.addOverlay(label);
     }
     render() {
         return (
