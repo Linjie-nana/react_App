@@ -42,8 +42,7 @@ class Map extends Component {
         // 将地址解析结果显示在地图上，并调整地图视野    
         myGeo.getPoint(this.state.oCurrentCity.label, point => {
             if (point) {
-                this.map.centerAndZoom(point, 11);
-                this.fnAddOverLay();
+                this.fnAddOverLay(point, this.state.oCurrentCity.value);
             }
         }, this.state.oCurrentCity.label);
 
@@ -55,10 +54,14 @@ class Map extends Component {
     }
 
     //自定义标签方法 http://lbsyun.baidu.com/jsdemo.htm#eAddLabel
-    fnAddOverLay = async () => {
+    fnAddOverLay = async (point, id) => {
+        //以坐标为中心缩放地图
+        this.map.centerAndZoom(point, 11);
+
+
         //创建加载状态
         Toast.loading('加载中..', 0)
-        let Res = await this.axios.get('/area/map?id=' + this.state.oCurrentCity.value);
+        let Res = await this.axios.get('/area/map?id=' + id);
         console.log(Res);
         //请求完后清除加载状态
         Toast.hide();
