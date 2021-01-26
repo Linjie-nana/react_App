@@ -138,19 +138,26 @@ class Map extends Component {
                 });
 
                 // 给label绑定点击事件
-                label.addEventListener('click', () => {
-                    // alert(item.label);
-                    this.fnShowHouselist(item.value)
+                label.addEventListener('click', (e) => {
+                    // 获取手指点击位置的x和y的值
+                    let { clientX, clientY } = e.changedTouches[0];
+
+                    //计算地图从手指的位置到也页面手中心处需要移动的x,y轴的值
+                    let moveX = window.innerWidth / 2 - clientX;
+                    let moveY = window.innerHeight / 4 - clientY;
+
+                    this.fnShowHouselist(item.value, { moveX, moveY })
 
                 })
-
                 this.map.addOverlay(label);
             })
         }
     }
 
     //根据层级修改样式
-    fnShowHouselist = async id => {
+    fnShowHouselist = async (id, move) => {
+        //将地图位移
+        this.map.panBy(move.moveX, move.moveY)
         Toast.loading('加载中...')
         // 发送详情数据请求
         let oRes = await this.axios.get('/houses?cityId=' + id)
