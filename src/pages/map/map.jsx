@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import './map.css'
 import store from '../../store/index.js'
 import { Toast } from 'antd-mobile'
+import { BASE_URL } from '../../utils'
+
 
 let BMap = window.BMap
 
@@ -11,7 +13,9 @@ class Map extends Component {
         super(props);
         this.state = {
             oCurrentCity: store.getState(),
-            sClass: 'houseList'
+            sClass: 'houseList',
+            aHouseList: []
+
         }
         //初始化时订阅
         this.unsubscrbe = store.subscribe(this.fnChangeCity)
@@ -128,7 +132,8 @@ class Map extends Component {
                 // 给label绑定点击事件
                 label.addEventListener('click', () => {
                     // alert(item.label);
-                    this.fnShowHouselist()
+                    this.fnShowHouselist(item.value)
+
                 })
 
                 this.map.addOverlay(label);
@@ -137,9 +142,15 @@ class Map extends Component {
     }
 
     //根据层级修改样式
-    fnShowHouselist = () => {
+    fnShowHouselist = async id => {
+        Toast.loading('加载中...')
+        // 发送详情数据请求
+        let oRes = await this.axios.get('/houses?cityId=' + id)
+        Toast.hide()
+        console.log(oRes);
         // alert('第三级别！')
         this.setState({
+            aHouseList: oRes.data.body.list,
             sClass: 'houseList houseListShow'
         })
     }
@@ -155,7 +166,7 @@ class Map extends Component {
 
 
     render() {
-        let { sClass } = this.state
+        let { sClass, aHouseList } = this.state
         return (
             //容器标签可以写成空标签
             <>
@@ -175,22 +186,31 @@ class Map extends Component {
                         </a>
                     </div>
                     <div className="houseItems">
-                        <div className="house">
-                            <div className="imgWrap">
-                                <img className="img" src='images/news/1.png' />
-                            </div>
-                            <div className="content">
-                                <h3 className="title">三期装修两房，南北户型</h3>
-                                <div className="desc">两室一厅</div>
-                                <div>
-                                    <span className="tag tag1">地铁近</span>
-                                    <span className="tag tag2">买菜方便</span>
+                        {
+                            aHouseList.map(item => (
+                                <div className="house" key={item.houseCode}>
+                                    <div className="imgWrap">
+                                        <img className="img" src={BASE_URL + item.houseImg} />
+                                    </div>
+                                    <div className="content">
+                                        <h3 className="title">{item.title}</h3>
+                                        <div className="desc">{item.desc}</div>
+                                        <div>
+                                            <div>
+                                                {
+                                                    item.tags.map((val, i) => <span className={"tag tag" + i} key={i}>{val}</span>)
+                                                }
+                                            </div>
+                                        </div>
+                                        <div className="price">
+                                            <span className="priceNum">{item.price}</span> 元/月
+                                    </div>
+                                    </div>
                                 </div>
-                                <div className="price">
-                                    <span className="priceNum">1600</span> 元/月
-                                </div>
-                            </div>
-                        </div>
+                            ))
+                        }
+
+
 
                     </div>
                 </div>
