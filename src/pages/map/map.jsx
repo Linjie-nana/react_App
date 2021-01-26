@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import './map.css'
 import store from '../../store/index.js'
+import { Toast } from 'antd-mobile'
+
 let BMap = window.BMap
 
 class Map extends Component {
@@ -41,7 +43,7 @@ class Map extends Component {
         myGeo.getPoint(this.state.oCurrentCity.label, point => {
             if (point) {
                 this.map.centerAndZoom(point, 11);
-                this.fnAddOverLay(point);
+                this.fnAddOverLay();
             }
         }, this.state.oCurrentCity.label);
 
@@ -53,19 +55,35 @@ class Map extends Component {
     }
 
     //自定义标签方法 http://lbsyun.baidu.com/jsdemo.htm#eAddLabel
-    fnAddOverLay = (point) => {
-        let opts = {
-            position: point, // 指定文本标注所在的地理位置
-            offset: new BMap.Size(37, -37) // 设置文本偏移量
-        };
-        // 创建文本标注对象
-        let label = new BMap.Label('<div class="map_label01">文本<br />套数</div>', opts);
-        // 自定义文本标注样式
-        label.setStyle({
-            border: '0px',
-            backgroundColor: 'transparent'
-        });
-        this.map.addOverlay(label);
+    fnAddOverLay = async () => {
+        //创建加载状态
+        Toast.loading('加载中..', 0)
+        let Res = await this.axios.get('/area/map?id=' + this.state.oCurrentCity.value);
+        console.log(Res);
+        //请求完后清除加载状态
+        Toast.hide();
+
+        let HouseList = Res.data.body;
+        HouseList.forEach(item => {
+
+            //取到经纬度
+            let { longitude, latitude } = item.coord;
+            //创建经纬度左边点
+            let point = new BMap.Point(longitude, latitude);
+
+            let opts = {
+                position: point, // 指定文本标注所在的地理位置
+                offset: new BMap.Size(37, -37) // 设置文本偏移量
+            };
+            // 创建文本标注对象
+            let label = new BMap.Label(`<div class="map_label01">${item.label}<br />${item.count}</div>`, opts);
+            // 自定义文本标注样式
+            label.setStyle({
+                border: '0px',
+                backgroundColor: 'transparent'
+            });
+            this.map.addOverlay(label);
+        })
     }
     render() {
         return (
