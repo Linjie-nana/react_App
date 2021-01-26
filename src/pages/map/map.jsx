@@ -7,6 +7,7 @@ import { BASE_URL } from '../../utils'
 
 let BMap = window.BMap
 
+
 class Map extends Component {
 
     constructor(props) {
@@ -45,6 +46,13 @@ class Map extends Component {
         //创建地图缩放等级
         this.level = 11
 
+
+        //当地图移动隐藏房源详情页面
+        this.map.addEventListener('movestart', () => {
+            this.setState({
+                sClass: 'houseList'
+            })
+        })
         let myGeo = new BMap.Geocoder();
         // 将地址解析结果显示在地图上，并调整地图视野    
         myGeo.getPoint(this.state.oCurrentCity.label, point => {
