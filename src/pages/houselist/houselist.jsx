@@ -31,7 +31,10 @@ class FilterBar extends Component {
             // 存储当前PickerView的过滤数据
             currentPickData: [],
             //存储当前PicerView的列数
-            cols: 1
+            cols: 1,
+
+            //储存右侧弹框数据
+            aTagsData: []
         }
         this.unsubscribe = store.subscribe(this.fnStoreChange)
     }
@@ -54,6 +57,16 @@ class FilterBar extends Component {
         console.log(oRes);
         this.setState({
             allFilterData: oRes.data.body
+        }, () => {
+            let { characteristic, floor, oriented, roomType } = this.state.oAllFilterData;
+            this.setState({
+                aTagsData: [
+                    { title: '户型', data: roomType },
+                    { title: '朝向', data: oriented },
+                    { title: '楼层', data: floor },
+                    { title: '房屋亮点', data: characteristic }
+                ]
+            })
         })
     }
     // 定义显示弹框的方法
@@ -141,47 +154,20 @@ class FilterBar extends Component {
                 {/* 弹框二和背景 */}
                 <div className={bShowTags ? "tags_pannel tags_pannel_in" : "tags_pannel tags_pannel_out"}>
                     <div className="tags_list">
-                        <h3>户型</h3>
-                        <div className="ul_wrap">
-                            <ul>
-                                <li className="active">一室</li>
-                                <li>二室</li>
-                                <li>三室</li>
-                                <li>四室</li>
-                                <li>四室+</li>
-                            </ul>
-                        </div>
-                        <h3>朝向</h3>
-                        <div className="ul_wrap">
-                            <ul>
-                                <li>东</li>
-                                <li>西</li>
-                                <li>南</li>
-                                <li>北</li>
-                                <li>东南</li>
-                                <li>东北</li>
-                                <li>西南</li>
-                                <li>西北</li>
-                            </ul>
-                        </div>
-                        <h3>楼层</h3>
-                        <div className="ul_wrap">
-                            <ul>
-                                <li>高楼层</li>
-                                <li>中楼层</li>
-                                <li>低楼层</li>
-                            </ul>
-                        </div>
-                        <h3>房屋亮点</h3>
-                        <div className="ul_wrap">
-                            <ul>
-                                <li>集中供暖</li>
-                                <li>双卫生间</li>
-                                <li>近地铁</li>
-                                <li>近菜场</li>
-                                <li>近公园</li>
-                            </ul>
-                        </div>
+                        {
+                            aTagsData.map((item, i) => (
+                                <div key={i}>
+                                    <h3>{item.title}</h3>
+                                    <div className="ul_wrap">
+                                        <ul>
+                                            {
+                                                item.data.map(val => <li key={val.value}>{val.label}</li>)
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                            ))
+                        }
                     </div>
                     <div className="tags_btns">
                         <span onClick={this.fnHidePop} >取消</span>
