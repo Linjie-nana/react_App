@@ -6,38 +6,60 @@ class FilterBar extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            bShowPicker: false,
             // 控制弹框一个及背景的显示和隐藏
-            bShowTags: false
+            bShowPicker: false,
             // 控制弹框二及背景的显示和隐藏
+            bShowTags: false,
+            // 循环出过滤条结构的数组
+            aFilterBarData: [
+                { title: '区域', type: 'area' },
+                { title: '方式', type: 'mode' },
+                { title: '租金', type: 'price' },
+                { title: '筛选', type: 'more' }
+            ]
         }
+    }
+
+    // 定义显示弹框的方法
+    fnShowPop = (sType) => {
+        if (sType !== 'more') {
+            this.setState({
+                bShowPicker: true,
+                bShowTags: false
+            })
+        } else {
+            this.setState({
+                bShowPicker: false,
+                bShowTags: true
+            })
+        }
+    }
+    // 定义隐藏弹框的方法
+    fnHidePop = () => {
+        this.setState({
+            bShowPicker: false,
+            bShowTags: false
+        })
     }
 
     render() {
         let {
             bShowPicker,
-            bShowTags
+            bShowTags,
+            aFilterBarData
         } = this.state
         return (
             <>
                 {/* 过滤条结构 */}
                 <ul className="filter_list">
-                    <li className="active">
-                        <span>区域</span>
-                        <i className="iconfont icon-xialajiantouxiangxia"></i>
-                    </li>
-                    <li className="current">
-                        <span>方式</span>
-                        <i className="iconfont icon-xialajiantouxiangxia"></i>
-                    </li>
-                    <li>
-                        <span>租金</span>
-                        <i className="iconfont icon-xialajiantouxiangxia"></i>
-                    </li>
-                    <li>
-                        <span>筛选</span>
-                        <i className="iconfont icon-xialajiantouxiangxia"></i>
-                    </li>
+                    {
+                        aFilterBarData.map(item => (
+                            <li key={item.type} onClick={() => this.fnShowPop(item.type)}>
+                                <span>{item.title}</span>
+                                <i className="iconfont icon-xialajiantouxiangxia"></i>
+                            </li>
+                        ))
+                    }
                 </ul>
 
                 {/* 弹框一及背景 */}
@@ -46,11 +68,11 @@ class FilterBar extends Component {
 
                     </div>
                     <div className="slide_btns">
-                        <span>取消</span>
+                        <span onClick={this.fnHidePop}>取消</span>
                         <b>确定</b>
                     </div>
                 </div>
-                <div className={bShowPicker ? "mask mask_in" : "mask mask_out"}></div>
+                <div className={bShowPicker ? "mask mask_in" : "mask mask_out"} onClick={this.fnHidePop}></div>
 
                 {/* 弹框二和背景 */}
                 <div className={bShowTags ? "tags_pannel tags_pannel_in" : "tags_pannel tags_pannel_out"}>
@@ -98,11 +120,11 @@ class FilterBar extends Component {
                         </div>
                     </div>
                     <div className="tags_btns">
-                        <span>取消</span>
+                        <span onClick={this.fnHidePop} >取消</span>
                         <b>确定</b>
                     </div>
                 </div>
-                <div className={bShowTags ? "mask2 mask_in" : "mask2 mask_out"}></div>
+                <div className={bShowTags ? "mask2 mask_in" : "mask2 mask_out"} onClick={this.fnHidePop}></div>
             </>
         )
     }
