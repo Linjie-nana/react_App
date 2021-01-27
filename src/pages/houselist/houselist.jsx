@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
 import Cityselect from '../../components/searchbar/searchbar';
 import './houselist.css';
+import { PickerView } from 'antd-mobile';
+import store from '../../store'
+
 
 class FilterBar extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            //在数据中心选中当前选中的城市
+            oCurrentCity: store.getState(),
+
             // 控制弹框一个及背景的显示和隐藏
             bShowPicker: false,
             // 控制弹框二及背景的显示和隐藏
@@ -16,21 +22,68 @@ class FilterBar extends Component {
                 { title: '方式', type: 'mode' },
                 { title: '租金', type: 'price' },
                 { title: '筛选', type: 'more' }
-            ]
+            ],
+            // 存储当前点击的过滤条按钮类型
+            sType: '',
+
+            //所有的过滤数据
+            allFilterData: {},
+            // 存储当前PickerView的过滤数据
+            currentPickData: [],
+            //存储当前PicerView的列数
+            cols: 1
         }
+        this.unsubscribe = store.subscribe(this.fnStoreChange)
+    }
+    // 订阅数据和销毁订阅
+    componentWillUnmount() {
+        this.unsubscribe()
     }
 
+    fnStoreChange = () => {
+        this.setState({
+            oCurrentCity: store.getState()
+        })
+    }
+    //开篇就加载的东西
+    componentDidMount() {
+        this.fnGetData()
+    }
+    fnGetData = async () => {
+        let oRes = await this.axios.get('/houses/condition?id=' + this.state.oCurrentCity.value)
+        console.log(oRes);
+        this.setState({
+            allFilterData: oRes.data.body
+        })
+    }
     // 定义显示弹框的方法
     fnShowPop = (sType) => {
         if (sType !== 'more') {
+            let { area, subway, rentType, price } = this.state.allFilterData;
+            let currentPickData = []
+            let cols = 1
+
+            if (sType === 'area') {
+                currentPickData = [area, subway]
+                cols = 3
+            } else if (sType === 'mode') {
+                currentPickData = rentType
+            } else {
+                currentPickData = price
+            }
             this.setState({
                 bShowPicker: true,
-                bShowTags: false
+                bShowTags: false,
+                //选中时更改类型
+                sType,
+                currentPickData,
+                cols
             })
         } else {
             this.setState({
                 bShowPicker: false,
-                bShowTags: true
+                bShowTags: true,
+                sType
             })
         }
     }
@@ -38,7 +91,9 @@ class FilterBar extends Component {
     fnHidePop = () => {
         this.setState({
             bShowPicker: false,
-            bShowTags: false
+            bShowTags: false,
+            // 存储当前点击的过滤条按钮类型
+            sType: ''
         })
     }
 
@@ -46,7 +101,12 @@ class FilterBar extends Component {
         let {
             bShowPicker,
             bShowTags,
-            aFilterBarData
+            aFilterBarData,
+            sType,
+            //选择组件的数据
+            currentPickData,
+            //行数
+            cols
         } = this.state
         return (
             <>
@@ -54,9 +114,9 @@ class FilterBar extends Component {
                 <ul className="filter_list">
                     {
                         aFilterBarData.map(item => (
-                            <li key={item.type} onClick={() => this.fnShowPop(item.type)}>
+                            <li key={item.type} onClick={() => this.fnShowPop(item.type)} className={(sType === item.type) ? "current" : ""}>
                                 <span>{item.title}</span>
-                                <i className="iconfont icon-xialajiantouxiangxia"></i>
+                                <i className="iconfont icon-xialajiantouxiangxia" ></i>
                             </li>
                         ))
                     }
@@ -65,7 +125,11 @@ class FilterBar extends Component {
                 {/* 弹框一及背景 */}
                 <div className={bShowPicker ? "slide_pannel pannel_in" : "slide_pannel pannel_out"}>
                     <div className="slide_comp">
-
+                        <PickerView
+                            data={currentPickData}
+                            cascade={true}
+                            cols={cols}
+                        />
                     </div>
                     <div className="slide_btns">
                         <span onClick={this.fnHidePop}>取消</span>
