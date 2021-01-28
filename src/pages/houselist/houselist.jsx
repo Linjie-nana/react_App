@@ -41,7 +41,9 @@ class FilterBar extends Component {
                 area: ['area', 'null'],
                 mode: ['null'],
                 price: ['null']
-            }
+            },
+            // 存储右侧弹框的值
+            aTagsVal: []
         }
         this.unsubscribe = store.subscribe(this.fnStoreChange)
     }
@@ -131,6 +133,27 @@ class FilterBar extends Component {
         })
     }
 
+    // 定义获取弹框二值的方法
+    fnGetTagsVal = (val) => {
+        this.setState(state => {
+            let aNowTagsVal = state.aTagsVal;
+            // 判断数组aNowTagsVal中是否包含传入的val的值
+            if (aNowTagsVal.includes(val)) {
+                aNowTagsVal = aNowTagsVal.filter(item => item !== val)
+            } else {
+                aNowTagsVal.push(val)
+            }
+
+            return {
+                aTagsVal: aNowTagsVal
+            }
+        }, () => {
+            console.log(this.state.aTagsVal);
+        })
+
+
+    }
+
     render() {
         let {
             bShowPicker,
@@ -143,7 +166,9 @@ class FilterBar extends Component {
             cols,
             aTagsData,
             // PicerView中三个类型选中值
-            oPickerVal
+            oPickerVal,
+            //侧边弹框的储存变量
+            aTagsVal
         } = this.state
         return (
             <>
@@ -187,7 +212,7 @@ class FilterBar extends Component {
                                     <div className="ul_wrap">
                                         <ul>
                                             {
-                                                item.data.map(val => <li key={val.value}>{val.label}</li>)
+                                                item.data.map(val => <li className={(aTagsVal.includes(val.value)) ? "active" : ""} key={val.value} onClick={() => this.fnGetTagsVal(val.value)}>{val.label}</li>)
                                             }
                                         </ul>
                                     </div>
