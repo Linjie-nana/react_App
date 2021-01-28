@@ -34,7 +34,14 @@ class FilterBar extends Component {
             cols: 1,
 
             //储存右侧弹框数据
-            aTagsData: []
+            aTagsData: [],
+
+            // 存储PicerView三个类型选中的值
+            oPickerVal: {
+                area: ['area', 'null'],
+                mode: ['null'],
+                price: ['null']
+            }
         }
         this.unsubscribe = store.subscribe(this.fnStoreChange)
     }
@@ -58,7 +65,7 @@ class FilterBar extends Component {
         this.setState({
             allFilterData: oRes.data.body
         }, () => {
-            let { characteristic, floor, oriented, roomType } = this.state.oAllFilterData;
+            let { characteristic, floor, oriented, roomType } = this.state.allFilterData;
             this.setState({
                 aTagsData: [
                     { title: '户型', data: roomType },
@@ -110,6 +117,20 @@ class FilterBar extends Component {
         })
     }
 
+    // 定义获取PickerView值的方法
+    // 插件返回一个val，让style与val绑定数组，完成储存
+    fnGetPickerVal = (val) => {
+        this.setState(state => {
+            let oNowPickerVal = state.oPickerVal;
+            oNowPickerVal[state.sType] = val;
+            return {
+                oPickerVal: oNowPickerVal
+            }
+        }, () => {
+            console.log(this.state.oPickerVal)
+        })
+    }
+
     render() {
         let {
             bShowPicker,
@@ -119,7 +140,10 @@ class FilterBar extends Component {
             //选择组件的数据
             currentPickData,
             //行数
-            cols
+            cols,
+            aTagsData,
+            // PicerView中三个类型选中值
+            oPickerVal
         } = this.state
         return (
             <>
@@ -142,6 +166,8 @@ class FilterBar extends Component {
                             data={currentPickData}
                             cascade={true}
                             cols={cols}
+                            onChange={this.fnGetPickerVal}
+                            value={oPickerVal[sType]}
                         />
                     </div>
                     <div className="slide_btns">
