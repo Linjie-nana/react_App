@@ -52,17 +52,51 @@ class City extends Component {
         this.fnGetData()
     }
     fnGetData = async () => {
-        let Res = await this.axios.get('/area/city', {
-            params: {
-                level: 1
-            }
-        })
-        let { oCityList, aCityKey } = this.fnFormatData(Res.data.body);
+        // let Res = await this.axios.get('/area/city', {
+        //     params: {
+        //         level: 1
+        //     }
+        // })
+        // let { oCityList, aCityKey } = this.fnFormatData(Res.data.body);
+
+
+        //由于网速过慢，所以在第一次获取数据时存入永久储存中，这样可以降低下一次调试的效率
+        let sCityList = localStorage.getItem('haoke_city_list');
+        let aCityList = [];
+        if (sCityList) {
+            aCityList = JSON.parse(sCityList)
+            console.log(1111111111111111111111111111111111);
+        } else {
+            console.log(2222222222222222222222222222222222222222222222);
+            let oRes = await this.axios.get('/area/city', {
+                params: {
+                    level: 1
+                }
+            })
+            localStorage.setItem('haoke_city_list', JSON.stringify(oRes.data.body))
+            aCityList = oRes.data.body
+        }
+        let { oCityList, aCityKey } = this.fnFormatData(aCityList);
+
 
         //在原来数据的基础上添加 热门hot 城市
-        let Res2 = await this.axios.get('/area/hot');
-        oCityList.hot = Res2.data.body;
+        // let Res2 = await this.axios.get('/area/hot');
+        // oCityList.hot = Res2.data.body;
+        let sHotCity = localStorage.getItem('haoke_hot_city')
+        let aHotCity = [];
+        if (sHotCity) {
+            aHotCity = JSON.parse(sHotCity)
+        } else {
+            let oRes2 = await this.axios.get('/area/hot');
+            localStorage.setItem('haoke_hot_city', JSON.stringify(oRes2.data.body))
+            aHotCity = oRes2.data.body
+        }
+        oCityList.hot = aHotCity;
+
+
         aCityKey.unshift('hot');
+
+
 
         //在数据上添加 #当前城市
         oCityList['#'] = [this.state.oCurrentCity]
