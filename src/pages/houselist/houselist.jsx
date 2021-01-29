@@ -43,7 +43,15 @@ class FilterBar extends Component {
                 price: ['null']
             },
             // 存储右侧弹框的值
-            aTagsVal: []
+            aTagsVal: [],
+
+            //控制文字导航栏文字高亮
+            filterBarState: {
+                area: false,
+                mode: false,
+                price: false,
+                more: false
+            }
         }
         this.unsubscribe = store.subscribe(this.fnStoreChange)
     }
@@ -130,6 +138,7 @@ class FilterBar extends Component {
             }
         }, () => {
             console.log(this.state.oPickerVal)
+            this.fnSetFilterState()
         })
     }
 
@@ -149,9 +158,49 @@ class FilterBar extends Component {
             }
         }, () => {
             console.log(this.state.aTagsVal);
+            this.fnSetFilterState()
         })
+    }
 
+    //判断是否已经选择了数据的方法
+    fnSetFilterState = () => {
+        this.setState(state => {
+            //拿到储存选择的两个最新值
+            let PickerVal = state.oPickerVal;
+            let TagsVal = state.aTagsVal;
 
+            let FilterBarState = state.filterBarState;
+
+            //判断
+            if (PickerVal.area[0] === 'area' && PickerVal.area[1] === 'null') {
+                FilterBarState.area = false;
+            } else {
+                FilterBarState.area = true;
+            }
+
+            if (PickerVal.mode[0] === 'null') {
+                FilterBarState.mode = false;
+            } else {
+                FilterBarState.mode = true;
+            }
+
+            if (PickerVal.price[0] === 'null') {
+                FilterBarState.price = false;
+            } else {
+                FilterBarState.price = true;
+            }
+
+            if (TagsVal.length === 0) {
+                FilterBarState.more = false;
+            } else {
+                FilterBarState.more = true;
+            }
+
+            return {
+                filterBarState: FilterBarState
+            }
+
+        })
     }
 
     render() {
@@ -160,15 +209,12 @@ class FilterBar extends Component {
             bShowTags,
             aFilterBarData,
             sType,
-            //选择组件的数据
-            currentPickData,
-            //行数
-            cols,
-            aTagsData,
-            // PicerView中三个类型选中值
-            oPickerVal,
-            //侧边弹框的储存变量
-            aTagsVal
+            currentPickData,     //选择组件的数据
+            cols,           //行数
+            aTagsData,      //储存弹框二的数据
+            oPickerVal,    // PicerView中三个类型选中值
+            aTagsVal,       //侧边弹框的储存变量
+            filterBarState   //控制文字高亮的变量
         } = this.state
         return (
             <>
@@ -176,7 +222,7 @@ class FilterBar extends Component {
                 <ul className="filter_list">
                     {
                         aFilterBarData.map(item => (
-                            <li key={item.type} onClick={() => this.fnShowPop(item.type)} className={(sType === item.type) ? "current" : ""}>
+                            <li key={item.type} onClick={() => this.fnShowPop(item.type)} className={((sType === item.type) ? "current " : "") + ((filterBarState[item.type]) ? "active" : "''")}>
                                 <span>{item.title}</span>
                                 <i className="iconfont icon-xialajiantouxiangxia" ></i>
                             </li>
