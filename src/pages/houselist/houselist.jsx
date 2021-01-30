@@ -373,6 +373,9 @@ class Houselist extends Component {
         this.setState({
             aHouseList: oRes.data.body.list,
             count: oRes.data.body.count
+        }, () => {
+            //在数据存放等操作成功后，在调用list组件中的方法
+            this.list.scrollToRow(0);
         })
     }
     rowRenderer = ({ key, index, style }) => {
@@ -457,7 +460,13 @@ class Houselist extends Component {
                                 {({ height, width }) => (
                                     <List
                                         onRowsRendered={onRowsRendered}
-                                        ref={registerChild}
+                                        //list组件对象要拿出来放入this中，如果再次发送数据请求，则外部函数可调用list对象中的scrollToRow(0)达到返回第一条的效果
+                                        ref={(list) => {
+                                            // 将list对象绑定到this上
+                                            this.list = list;
+                                            // 将list对象通过registerChild方法也给到InfiniteLoader组件使用
+                                            registerChild(list);
+                                        }}
                                         width={width}
                                         height={height}
                                         rowCount={count}
