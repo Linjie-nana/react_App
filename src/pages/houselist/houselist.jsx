@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import Cityselect from '../../components/searchbar/searchbar';
 import './houselist.css';
-import { PickerView } from 'antd-mobile';
+import { PickerView, Toast } from 'antd-mobile';
 import store from '../../store'
 import { BASE_URL } from '../../utils'
-
-class FilterBar extends Component {
+import { List, AutoSizer } from 'react-virtualized'; class FilterBar extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -347,6 +346,7 @@ class Houselist extends Component {
         this.fnGetData()
     }
     fnGetData = async () => {
+        Toast.loading('加载中...', 0)
         let oRes = await this.axios.get('/houses', {
             params: {
                 cityId: this.state.oCurrentCity.value,
@@ -354,15 +354,46 @@ class Houselist extends Component {
                 end: 20
             }
         });
+        Toast.hide();
         this.setState({
             aHouseList: oRes.data.body.list,
             count: oRes.data.body.count
         })
     }
+    rowRenderer = ({ key, index, style }) => {
+        // 通过传入的索引值index去到aCityKey数组中拿到对应的字母
+        let item = this.state.aHouseList[index];
 
+        // 如果item是undefined( 如果数据还没请求回来 )
+        if (!item) {
+            return <div className="reload" key={key} style={style}><div>加载中...</div></div>
+        }
+
+        return (
+            <div className="house_wrap" key={key} style={style}>
+                <div className="house_item">
+                    <div className="imgWrap">
+                        <img className="img" src={BASE_URL + item.houseImg} />
+                    </div>
+                    <div className="content">
+                        <h3 className="title">{item.title}</h3>
+                        <div className="desc">{item.desc}</div>
+                        <div>
+                            {
+                                item.tags.map((val, i) => <span key={i} className={"tag tag" + i}>{val}</span>)
+                            }
+                        </div>
+                        <div className="price">
+                            <span className="priceNum">{item.price}</span> 元/月
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
     render() {
-        let { aHouseList } = this.state;
+        let { count } = this.state;
         return (
             <div>
                 <div className="list_title">
@@ -372,29 +403,17 @@ class Houselist extends Component {
                 </div>
                 <FilterBar />
                 <div className="house_list_con">
-                    {
-                        aHouseList.map(item => (
-                            <div className="house_wrap" key={item.houseCode}>
-                                <div className="house_item">
-                                    <div className="imgWrap">
-                                        <img className="img" src={BASE_URL + item.houseImg} />
-                                    </div>
-                                    <div className="content">
-                                        <h3 className="title">{item.title}</h3>
-                                        <div className="desc">{item.desc}</div>
-                                        <div>
-                                            {
-                                                item.tags.map((val, i) => <span key={i} className={"tag tag" + i}>{val}</span>)
-                                            }
-                                        </div>
-                                        <div className="price">
-                                            <span className="priceNum">{item.price}</span> 元/月
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))
-                    }
+                    <AutoSizer>
+                        {({ height, width }) => (
+                            <List
+                                width={width}
+                                height={height}
+                                rowCount={count}
+                                rowHeight={120}
+                                rowRenderer={this.rowRenderer}
+                            />
+                        )}
+                    </AutoSizer>
                 </div>
             </div>
         );
