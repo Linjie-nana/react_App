@@ -69,10 +69,20 @@ import { List, AutoSizer } from 'react-virtualized'; class FilterBar extends Com
         this.fnGetData()
     }
     fnGetData = async () => {
-        let oRes = await this.axios.get('/houses/condition?id=' + this.state.oCurrentCity.value)
-        console.log(oRes);
+        // let oRes = await this.axios.get('/houses/condition?id=' + this.state.oCurrentCity.value)
+        // console.log(oRes);
+        // 将发送获取到的导航栏数据存入永久储存
+        let sFilterData = localStorage.getItem('haoke_filter_data_' + this.state.oCurrentCity.value);
+        let aFilterData = [];
+        if (sFilterData) {
+            aFilterData = JSON.parse(sFilterData)
+        } else {
+            let oRes = await this.axios.get('/houses/condition?id=' + this.state.oCurrentCity.value)
+            localStorage.setItem('haoke_filter_data_' + this.state.oCurrentCity.value, JSON.stringify(oRes.data.body))
+            aFilterData = oRes.data.body
+        }
         this.setState({
-            allFilterData: oRes.data.body
+            allFilterData: aFilterData
         }, () => {
             let { characteristic, floor, oriented, roomType } = this.state.allFilterData;
             this.setState({
