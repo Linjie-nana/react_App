@@ -411,7 +411,7 @@ class Houselist extends Component {
         }
 
         return (
-            <div className="house_wrap" key={key} style={style}>
+            <div className="house_wrap" key={key} style={style} onClick={() => this.props.history.push('/detail/' + item.houseCode)}>
                 <div className="house_item">
                     <div className="imgWrap">
                         <img className="img" src={BASE_URL + item.houseImg} />
