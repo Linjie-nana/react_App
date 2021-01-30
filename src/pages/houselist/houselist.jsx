@@ -203,6 +203,51 @@ class FilterBar extends Component {
         })
     }
 
+    fnFormatParams = () => {
+        this.setState(state => {
+            // 拿到oPickerVal最新的值
+            let oNowPickerVal = state.oPickerVal;
+            // 拿到aTagsVal最新的值
+            let aNowTagsVal = state.aTagsVal;
+
+            let oParams = {};
+
+            // 放area对应的数据到oParams中
+            if (oNowPickerVal.area.length === 2) {
+                oParams[oNowPickerVal.area[0]] = oNowPickerVal.area[1]
+            } else if (oNowPickerVal.area[2] === 'null') {
+                oParams[oNowPickerVal.area[0]] = oNowPickerVal.area[1]
+            } else {
+                oParams[oNowPickerVal.area[0]] = oNowPickerVal.area[2]
+            }
+
+            // 放mode对应的数据到oParams中
+            oParams.rentType = oNowPickerVal.mode[0]
+
+
+            // 放price对应的数据到oParams中
+            if (oNowPickerVal.price[0] === 'null') {
+                oParams.price = 'null'
+            } else {
+                oParams.price = oNowPickerVal.price[0].split('|')[1]
+            }
+
+            // 放more对应的数据到oParams中
+            oParams.more = aNowTagsVal.join(',');
+
+            // 待续....
+            console.log(oParams);
+
+
+            return {
+                bShowPicker: false,
+                bShowTags: false,
+                sType: ''
+            }
+
+        })
+    }
+
     render() {
         let {
             bShowPicker,
@@ -243,7 +288,7 @@ class FilterBar extends Component {
                     </div>
                     <div className="slide_btns">
                         <span onClick={this.fnHidePop}>取消</span>
-                        <b>确定</b>
+                        <b onClick={this.fnFormatParams}>确定</b>
                     </div>
                 </div>
                 <div className={bShowPicker ? "mask mask_in" : "mask mask_out"} onClick={this.fnHidePop}></div>
@@ -268,7 +313,7 @@ class FilterBar extends Component {
                     </div>
                     <div className="tags_btns">
                         <span onClick={this.fnHidePop} >取消</span>
-                        <b>确定</b>
+                        <b onClick={this.fnFormatParams}>确定</b>
                     </div>
                 </div>
                 <div className={bShowTags ? "mask2 mask_in" : "mask2 mask_out"} onClick={this.fnHidePop}></div>
