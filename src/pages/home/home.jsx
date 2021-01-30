@@ -64,6 +64,12 @@ class Slide extends Component {
             data: oRes.data.body
         })
     }
+
+    componentWillUnmount = () => {
+        this.setState = (state, callback) => {
+            return;
+        };
+    }
     render() {
         return (
             <div className="slide_con">
@@ -129,6 +135,11 @@ class Group extends Component {
     componentDidMount() {
         this.fnGetdata()
     }
+    componentWillUnmount = () => {
+        this.setState = (state, callback) => {
+            return;
+        };
+    }
     fnGetdata = async () => {
         let oRes = await this.axios.get("/home/groups?area=AREA%7C88cff55c-aaa4-e2e0")
         console.log(oRes);
@@ -168,6 +179,11 @@ class News extends Component {
     }
     componentDidMount() {
         this.fnGetdata()
+    }
+    componentWillUnmount = () => {
+        this.setState = (state, callback) => {
+            return;
+        };
     }
     fnGetdata = async () => {
         let oRes = await this.axios.get("/home/news?area=AREA%7C88cff55c-aaa4-e2e0")
