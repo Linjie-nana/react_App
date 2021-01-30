@@ -3,7 +3,7 @@ import Cityselect from '../../components/searchbar/searchbar';
 import './houselist.css';
 import { PickerView } from 'antd-mobile';
 import store from '../../store'
-
+import { BASE_URL } from '../../utils'
 
 class FilterBar extends Component {
     constructor(props) {
@@ -323,16 +323,79 @@ class FilterBar extends Component {
 }
 
 class Houselist extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            oCurrentCity: store.getState(),
+            aHouseList: [],
+            count: 0
+        }
+        this.unsubscribe = store.subscribe(this.fnStoreChange)
+    }
+    componentWillUnmount() {
+        this.unsubscribe();
+        this.setState = (state, callback) => {
+            return;
+        }
+    }
+    fnStoreChange = () => {
+        this.setState({
+            oCurrentCity: store.getState()
+        })
+    }
+    componentDidMount() {
+        this.fnGetData()
+    }
+    fnGetData = async () => {
+        let oRes = await this.axios.get('/houses', {
+            params: {
+                cityId: this.state.oCurrentCity.value,
+                start: 1,
+                end: 20
+            }
+        });
+        this.setState({
+            aHouseList: oRes.data.body.list,
+            count: oRes.data.body.count
+        })
+    }
+
+
     render() {
+        let { aHouseList } = this.state;
         return (
             <div>
-                找房页面
                 <div className="list_title">
                     <span className="back iconfont icon-prev" onClick={() => this.props.history.goBack()}></span>
                     <Cityselect />
                     <i className="iconfont icon-ic-maplocation-o tomap" onClick={() => this.props.history.push('/map')}></i>
                 </div>
                 <FilterBar />
+                <div className="house_list_con">
+                    {
+                        aHouseList.map(item => (
+                            <div className="house_wrap" key={item.houseCode}>
+                                <div className="house_item">
+                                    <div className="imgWrap">
+                                        <img className="img" src={BASE_URL + item.houseImg} />
+                                    </div>
+                                    <div className="content">
+                                        <h3 className="title">{item.title}</h3>
+                                        <div className="desc">{item.desc}</div>
+                                        <div>
+                                            {
+                                                item.tags.map((val, i) => <span key={i} className={"tag tag" + i}>{val}</span>)
+                                            }
+                                        </div>
+                                        <div className="price">
+                                            <span className="priceNum">{item.price}</span> 元/月
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    }
+                </div>
             </div>
         );
     }
