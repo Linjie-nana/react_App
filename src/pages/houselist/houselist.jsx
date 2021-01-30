@@ -62,6 +62,24 @@ import { List, AutoSizer, InfiniteLoader } from 'react-virtualized'; class Filte
     fnStoreChange = () => {
         this.setState({
             oCurrentCity: store.getState()
+        }, () => {
+            //如果城市发生改变，则重新发送数据，并且将获取的数据初始化
+
+            this.fnGetData();
+            this.setState({
+                oPickerVal: {
+                    area: ['area', 'null'],
+                    mode: ['null'],
+                    price: ['null']
+                },
+                aTagsVal: [],
+                oFilterBarState: {
+                    area: false,
+                    mode: false,
+                    price: false,
+                    more: false
+                }
+            })
         })
     }
     //开篇就加载的东西
@@ -350,6 +368,8 @@ class Houselist extends Component {
     fnStoreChange = () => {
         this.setState({
             oCurrentCity: store.getState()
+        }, () => {
+            this.fnGetData({})
         })
     }
     componentDidMount() {
