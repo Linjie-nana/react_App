@@ -234,8 +234,8 @@ import { List, AutoSizer } from 'react-virtualized'; class FilterBar extends Com
             // 放more对应的数据到oParams中
             oParams.more = aNowTagsVal.join(',');
 
-            // 待续....
-            console.log(oParams);
+            // 将最终的过滤参数传给父组件
+            this.props.fnGetData(oParams);
 
 
             return {
@@ -343,12 +343,13 @@ class Houselist extends Component {
         })
     }
     componentDidMount() {
-        this.fnGetData()
+        this.fnGetData({})
     }
-    fnGetData = async () => {
+    fnGetData = async (params) => {
         Toast.loading('加载中...', 0)
         let oRes = await this.axios.get('/houses', {
             params: {
+                ...params,
                 cityId: this.state.oCurrentCity.value,
                 start: 1,
                 end: 20
@@ -401,7 +402,8 @@ class Houselist extends Component {
                     <Cityselect />
                     <i className="iconfont icon-ic-maplocation-o tomap" onClick={() => this.props.history.push('/map')}></i>
                 </div>
-                <FilterBar />
+                {/* 子组件调用父组件的时候，定义方法让子组件调用 */}
+                <FilterBar fnGetData={this.fnGetData} />
                 <div className="house_list_con">
                     <AutoSizer>
                         {({ height, width }) => (
