@@ -4,7 +4,7 @@ import './houselist.css';
 import { PickerView, Toast } from 'antd-mobile';
 import store from '../../store'
 import { BASE_URL } from '../../utils'
-import { List, AutoSizer } from 'react-virtualized'; class FilterBar extends Component {
+import { List, AutoSizer, InfiniteLoader } from 'react-virtualized'; class FilterBar extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -354,8 +354,12 @@ class Houselist extends Component {
     }
     componentDidMount() {
         this.fnGetData({})
+        //这个值给下面无缝下拉用
+        this.params = {};
     }
     fnGetData = async (params) => {
+        // 存储传入的参数到this.params上
+        this.params = params;
         Toast.loading('加载中...', 0)
         let oRes = await this.axios.get('/houses', {
             params: {
@@ -403,6 +407,31 @@ class Houselist extends Component {
         )
     }
 
+    //({ index: number }): boolean
+    isRowLoaded = ({ index }) => {
+        return !!this.state.aHouseList[index];
+    }
+
+    // 定义列表滚动时加载更多行的方法,
+    loadMoreRows = ({ startIndex, stopIndex }) => {
+        // 组件传回来的数值再发送请求，数据在原始基础上再覆盖
+        return this.axios.get('/houses', {
+            params: {
+                ...this.params,
+                cityId: this.state.oCurrentCity.value,
+                start: startIndex,
+                end: stopIndex
+            }
+        }).then(data => {
+            // console.log(data);
+            this.setState(state => {
+                return {
+                    aHouseList: [...state.aHouseList, ...data.data.body.list]
+                }
+            })
+        })
+    }
+
     render() {
         let { count } = this.state;
         return (
@@ -414,18 +443,31 @@ class Houselist extends Component {
                 </div>
                 {/* 子组件调用父组件的时候，定义方法让子组件调用 */}
                 <FilterBar fnGetData={this.fnGetData} />
+
+
                 <div className="house_list_con">
-                    <AutoSizer>
-                        {({ height, width }) => (
-                            <List
-                                width={width}
-                                height={height}
-                                rowCount={count}
-                                rowHeight={120}
-                                rowRenderer={this.rowRenderer}
-                            />
+
+                    <InfiniteLoader
+                        isRowLoaded={this.isRowLoaded}
+                        loadMoreRows={this.loadMoreRows}
+                        rowCount={count}
+                    >
+                        {({ onRowsRendered, registerChild }) => (
+                            <AutoSizer>
+                                {({ height, width }) => (
+                                    <List
+                                        onRowsRendered={onRowsRendered}
+                                        ref={registerChild}
+                                        width={width}
+                                        height={height}
+                                        rowCount={count}
+                                        rowHeight={120}
+                                        rowRenderer={this.rowRenderer}
+                                    />
+                                )}
+                            </AutoSizer>
                         )}
-                    </AutoSizer>
+                    </InfiniteLoader>
                 </div>
             </div>
         );
