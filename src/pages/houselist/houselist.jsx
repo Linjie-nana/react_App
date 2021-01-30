@@ -4,7 +4,10 @@ import './houselist.css';
 import { PickerView, Toast } from 'antd-mobile';
 import store from '../../store'
 import { BASE_URL } from '../../utils'
-import { List, AutoSizer, InfiniteLoader } from 'react-virtualized'; class FilterBar extends Component {
+import { List, AutoSizer, InfiniteLoader } from 'react-virtualized';
+import notfound from '../../assets/images/not-found.png'
+
+class FilterBar extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -354,7 +357,7 @@ class Houselist extends Component {
         super(props);
         this.state = {
             oCurrentCity: store.getState(),
-            aHouseList: [],
+            aHouseList: [{}],
             count: 0
         }
         this.unsubscribe = store.subscribe(this.fnStoreChange)
@@ -497,6 +500,12 @@ class Houselist extends Component {
                             </AutoSizer>
                         )}
                     </InfiniteLoader>
+                    {
+                        this.state.aHouseList.length === 0 && <div className="notfound">
+                            <img src={notfound} alt="未找到" />
+                            <p>啥都美优啊~</p>
+                        </div>
+                    }
                 </div>
             </div>
         );
